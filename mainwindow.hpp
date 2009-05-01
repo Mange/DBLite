@@ -32,6 +32,7 @@ signals:
     void openedStatusChanged(bool);
 
 private slots:
+    void on_actionQuit_triggered();
     void on_actionClose_triggered();
     void on_actionExecute_query_triggered();
     void on_actionOpen_triggered();

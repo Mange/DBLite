@@ -119,3 +119,10 @@ void MainWindow::on_actionClose_triggered()
     resetResultView();
     emit openedStatusChanged(false);
 }
+
+void MainWindow::on_actionQuit_triggered()
+{
+    // Close everything and quit
+    ui->actionClose->trigger();
+    emit close();
+}
