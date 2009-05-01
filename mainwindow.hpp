@@ -15,6 +15,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+// TODO: Implement proxy icon per http://doc.trolltech.com/qq/qq18-macfeatures.html
+
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
