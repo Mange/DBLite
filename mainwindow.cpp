@@ -60,20 +60,26 @@ void MainWindow::updateTitle(bool opened)
 void MainWindow::on_actionOpen_triggered()
 {
     dbPath = QFileDialog::getOpenFileName(this, tr("Open database"));
-    dbName = QString("Foobar");
-
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", dbIdentifier);
-    db.setDatabaseName(dbPath);
-    if (!db.open())
+    if (dbPath != QString())
     {
-        QMessageBox::warning(
-                this,
-                tr("Unable to open database"),
-                tr("An error occurred while opening the connection: ") + db.lastError().text()
-        );
-    }
+        dbName = QString("Foobar");
 
-    emit openedStatusChanged(true);
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", dbIdentifier);
+        db.setDatabaseName(dbPath);
+        if (!db.open())
+        {
+            QMessageBox::warning(
+                    this,
+                    tr("Unable to open database"),
+                    tr("An error occurred while opening the connection: ") + db.lastError().text()
+            );
+            emit openedStatusChanged(false);
+        }
+        else
+        {
+            emit openedStatusChanged(true);
+        }
+    }
 }
 
 void MainWindow::on_actionExecute_query_triggered()
