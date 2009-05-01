@@ -1,0 +1,9 @@
+# Auto-generated files
+*.o
+*.app
+Makefile
+ui_*.h
+moc_*
+
+# State files not part of the real project
+DBLite.pro.user
