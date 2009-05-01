@@ -3,6 +3,9 @@
 
 #include <QtGui/QMainWindow>
 
+#include <QtGui>
+#include <QtSql>
+
 namespace Ui
 {
     class MainWindow;
@@ -17,7 +20,23 @@ public:
     ~MainWindow();
 
 private:
+    void resetResultView();
+
     Ui::MainWindow *ui;
+    const char *dbIdentifier;
+
+    QString dbName;
+    QString dbPath;
+
+signals:
+    void openedStatusChanged(bool);
+
+private slots:
+    void on_actionClose_triggered();
+    void on_actionExecute_query_triggered();
+    void on_actionOpen_triggered();
+    void updateTitle(bool);
+    void setActionStates(bool);
 };
 
 #endif // MAINWINDOW_HPP
