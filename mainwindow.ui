@@ -119,11 +119,17 @@
     <addaction name="actionOpen"/>
     <addaction name="actionClose"/>
     <addaction name="separator"/>
-    <addaction name="actionExecute_query"/>
-    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menu_Database">
+    <property name="title">
+     <string>&amp;Database</string>
+    </property>
+    <addaction name="actionReloadTree"/>
+    <addaction name="actionExecute_query"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Database"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
