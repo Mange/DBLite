@@ -19,17 +19,25 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = 0);
+    MainWindow(QString fileName, QWidget *parent);
     ~MainWindow();
 
+    // Returns true when a file has been opened. Use this before displaying a new window to
+    // know if the user actually opened a file or if the window is about to autoclose.
+    bool valid();
+
 private:
+    void init();
+    bool openFile();
+    bool openFile(QString fileName);
     void resetResultView();
     void loadTableDescription(QString tableName, QString dbIdentifier, QTreeWidgetItem *parent);
     QString getDatabaseType(QSqlField field);
     int getRowCount(QString tableName, QString dbIdentifier);
 
     Ui::MainWindow *ui;
-    const char *dbIdentifier;
 
+    QString dbIdentifier;
     QString dbName;
     QString dbPath;
 
@@ -37,11 +45,11 @@ signals:
     void openedStatusChanged(bool);
 
 private slots:
+    void initialized();
     void on_actionQuit_triggered();
-    void on_actionClose_triggered();
     void on_actionExecute_query_triggered();
     void on_actionOpen_triggered();
-    void updateTitle(bool);
+    void updateTitle();
     void setActionStates(bool);
     void reloadTableTree();
 };

@@ -4,32 +4,103 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
-
-    dbIdentifier = "opened_db";
-    dbName = QString();
-    dbPath = QString();
-
-    // Connect slots
-    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(updateTitle(bool)));
-    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(setActionStates(bool)));
-    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(reloadTableTree()));
-
-    connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
-
-
     // Check if we have any DB drivers ready
     if( QSqlDatabase::drivers().isEmpty() ) {
         QMessageBox::critical(this, tr("No database engines found!"), tr("No Qt Dabase plugins found. You need some drivers to connect to an source."));
         exit(1);
     }
 
-    emit openedStatusChanged(false);
+    init();
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    //resetResultView();
+    //delete ui;
+}
+
+bool MainWindow::valid()
+{
+    return dbPath != QString();
+}
+
+void MainWindow::init()
+{
+    ui->setupUi(this);
+
+    setAttribute(Qt::WA_DeleteOnClose);
+    setUnifiedTitleAndToolBarOnMac(true);
+    dbIdentifier = QString();
+
+    // Connect slots
+    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(updateTitle()));
+    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(setActionStates(bool)));
+    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(reloadTableTree()));
+
+    connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
+
+    emit initialized();
+}
+
+void MainWindow::initialized()
+{
+    if(!openFile())
+    {
+        emit close();
+    }
+    else
+    {
+        emit openedStatusChanged(true);
+    }
+}
+
+bool MainWindow::openFile()
+{
+    QString path = QFileDialog::getOpenFileName(this, tr("Open database"));
+    if (path != QString())
+    {
+        return openFile(path);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool MainWindow::openFile(QString path)
+{
+    dbPath = path;
+    dbName = QFileInfo(dbPath).fileName();
+    dbIdentifier = QString("opened_db_%1").arg(dbName);
+
+    // Check if we already have the connection opened and reuse in that case
+    QSqlDatabase db;
+    if (QSqlDatabase::connectionNames().contains(dbIdentifier))
+    {
+        db = QSqlDatabase::database(dbIdentifier);
+    }
+    else
+    {
+        db = QSqlDatabase::addDatabase("QSQLITE", dbIdentifier);
+        db.setDatabaseName(dbPath);
+    }
+
+    if (!db.open())
+    {
+        QMessageBox::warning(
+                this,
+                tr("Unable to open database"),
+                tr("An error occurred while opening the connection: ") + db.lastError().text()
+                );
+        dbName = QString();
+        dbPath = QString();
+        dbIdentifier = QString();
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 void MainWindow::resetResultView()
@@ -39,24 +110,14 @@ void MainWindow::resetResultView()
 
 void MainWindow::setActionStates(bool opened)
 {
-    ui->actionOpen->setEnabled(!opened);
-
-    ui->actionClose->setEnabled(opened);
     ui->actionExecute_query->setEnabled(opened);
     ui->executeQueryButton->setEnabled(opened);
     ui->actionReloadTree->setEnabled(opened);
 }
 
-void MainWindow::updateTitle(bool opened)
+void MainWindow::updateTitle()
 {
-    if (opened)
-    {
-        this->setWindowTitle(tr("DBLite - %1").arg(dbName));
-    }
-    else
-    {
-        this->setWindowTitle(tr("DBLite - No database opened"));
-    }
+    this->setWindowTitle(tr("DBLite - %1").arg(dbName));
 }
 
 QString MainWindow::getDatabaseType(QSqlField field)
@@ -133,26 +194,11 @@ void MainWindow::reloadTableTree()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    dbPath = QFileDialog::getOpenFileName(this, tr("Open database"));
-    if (dbPath != QString())
+    MainWindow *other = new MainWindow();
+    if (other->valid())
     {
-        dbName = QFileInfo(dbPath).fileName();
-
-        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", dbIdentifier);
-        db.setDatabaseName(dbPath);
-        if (!db.open())
-        {
-            QMessageBox::warning(
-                    this,
-                    tr("Unable to open database"),
-                    tr("An error occurred while opening the connection: ") + db.lastError().text()
-            );
-            emit openedStatusChanged(false);
-        }
-        else
-        {
-            emit openedStatusChanged(true);
-        }
+        other->move(this->x() + 10, this->y() + 10);
+        other->show();
     }
 }
 
@@ -181,17 +227,6 @@ void MainWindow::on_actionExecute_query_triggered()
     {
         emit setStatusTip(tr("Affected %1 rows").arg(model->query().numRowsAffected()));
     }
-}
-
-void MainWindow::on_actionClose_triggered()
-{
-    QSqlDatabase::database(dbIdentifier, false).close();
-    QSqlDatabase::removeDatabase(dbIdentifier);
-    dbName = QString();
-    dbPath = QString();
-
-    resetResultView();
-    emit openedStatusChanged(false);
 }
 
 void MainWindow::on_actionQuit_triggered()
