@@ -136,7 +136,7 @@ void MainWindow::on_actionOpen_triggered()
     dbPath = QFileDialog::getOpenFileName(this, tr("Open database"));
     if (dbPath != QString())
     {
-        dbName = QString("Foobar");
+        dbName = QFileInfo(dbPath).fileName();
 
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", dbIdentifier);
         db.setDatabaseName(dbPath);
