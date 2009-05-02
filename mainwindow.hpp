@@ -40,6 +40,7 @@ private slots:
     void on_actionOpen_triggered();
     void updateTitle(bool);
     void setActionStates(bool);
+    void reloadTableTree();
 };
 
 #endif // MAINWINDOW_HPP

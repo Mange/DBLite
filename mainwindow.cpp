@@ -13,6 +13,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect slots
     connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(updateTitle(bool)));
     connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(setActionStates(bool)));
+    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(reloadTableTree()));
+
+    connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
+
 
     // Check if we have any DB drivers ready
     if( QSqlDatabase::drivers().isEmpty() ) {
@@ -43,6 +47,7 @@ void MainWindow::setActionStates(bool opened)
 
     ui->actionExecute_query->setEnabled(opened);
     ui->executeQueryButton->setEnabled(opened);
+    ui->actionReloadTree->setEnabled(opened);
 }
 
 void MainWindow::updateTitle(bool opened)
@@ -54,6 +59,28 @@ void MainWindow::updateTitle(bool opened)
     else
     {
         this->setWindowTitle(tr("DBLite - No database opened"));
+    }
+}
+
+void MainWindow::reloadTableTree()
+{
+    ui->tableTree->clear();
+    if (dbName == QString()) { return; }
+    
+    // Set the root node to the opened database
+    QTreeWidgetItem *root = new QTreeWidgetItem(ui->tableTree, QStringList(dbName), 0);
+
+    // Get all tables and add them in order
+    QStringList tables = QSqlDatabase::database(dbIdentifier, true).tables(QSql::AllTables);
+    QStringList::const_iterator constIterator;
+    for(constIterator = tables.begin(); constIterator != tables.end(); constIterator++)
+    {
+        QString tableName = (*constIterator);
+
+        // Give a random row count for now
+        QTreeWidgetItem *table = new QTreeWidgetItem(root);
+        table->setText(0, tableName);
+        table->setText(1, QString("14"));
     }
 }
 

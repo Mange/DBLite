@@ -16,14 +16,58 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QSplitter" name="queryResultSplitter">
+     <widget class="QSplitter" name="splitter_2">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPlainTextEdit" name="queryEdit"/>
+         <widget class="QSplitter" name="splitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QTreeWidget" name="tableTree">
+           <property name="showDropIndicator" stdset="0">
+            <bool>false</bool>
+           </property>
+           <property name="columnCount">
+            <number>2</number>
+           </property>
+           <attribute name="headerDefaultSectionSize">
+            <number>120</number>
+           </attribute>
+           <attribute name="headerShowSortIndicator" stdset="0">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="headerStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="headerDefaultSectionSize">
+            <number>120</number>
+           </attribute>
+           <attribute name="headerShowSortIndicator" stdset="0">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="headerStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>Table</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Rows</string>
+            </property>
+            <property name="whatsThis">
+             <string>Shows the number of rows in the table next to it</string>
+            </property>
+           </column>
+          </widget>
+          <widget class="QPlainTextEdit" name="queryEdit"/>
+         </widget>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
@@ -90,6 +134,7 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionClose"/>
+   <addaction name="actionReloadTree"/>
    <addaction name="actionExecute_query"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -144,6 +189,17 @@
    </property>
    <property name="menuRole">
     <enum>QAction::QuitRole</enum>
+   </property>
+  </action>
+  <action name="actionReloadTree">
+   <property name="text">
+    <string>Reload tables</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload the tables listing from the database</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>
