@@ -23,6 +23,9 @@ public:
 
 private:
     void resetResultView();
+    void loadTableDescription(QString tableName, QString dbIdentifier, QTreeWidgetItem *parent);
+    QString getDatabaseType(QSqlField field);
+    int getRowCount(QString tableName, QString dbIdentifier);
 
     Ui::MainWindow *ui;
     const char *dbIdentifier;

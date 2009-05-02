@@ -62,6 +62,53 @@ void MainWindow::updateTitle(bool opened)
     }
 }
 
+QString MainWindow::getDatabaseType(QSqlField field)
+{
+    switch(field.type())
+    {
+        case QVariant::String:
+            return tr("String");
+        case QVariant::Int:
+            return tr("Integer");
+        case QVariant::Double:
+            return tr("Real");
+        default:
+            return tr("Unknown type: %1").arg(field.type());
+    }
+}
+
+void MainWindow::loadTableDescription(QString tableName, QString dbIdentifier, QTreeWidgetItem *parent)
+{
+    QSqlRecord record = QSqlDatabase::database(dbIdentifier).record(tableName);
+    if (record.count() > 0)
+    {
+        for(int i = 0; i < record.count(); i++)
+        {
+            QSqlField field = record.field(i);
+
+            QTreeWidgetItem *column = new QTreeWidgetItem(parent);
+            column->setText(0, field.name());
+            column->setText(1, getDatabaseType(field));
+        }
+    }
+}
+
+int MainWindow::getRowCount(QString tableName, QString dbIdentifier)
+{
+    QSqlQuery query(QSqlDatabase::database(dbIdentifier));
+    if (query.exec(QString("SELECT COUNT(*) FROM %1").arg(tableName)))
+    {
+        query.first();
+        int count = query.value(0).toInt();
+        query.finish();
+        return count;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
 void MainWindow::reloadTableTree()
 {
     ui->tableTree->clear();
@@ -80,7 +127,10 @@ void MainWindow::reloadTableTree()
         // Give a random row count for now
         QTreeWidgetItem *table = new QTreeWidgetItem(root);
         table->setText(0, tableName);
-        table->setText(1, QString("14"));
+        table->setText(1, QString::number(getRowCount(tableName, dbIdentifier)));
+
+        // Load the description for the table
+        loadTableDescription(tableName, dbIdentifier, table);
     }
 }
 
