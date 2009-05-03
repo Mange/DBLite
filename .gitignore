@@ -8,3 +8,4 @@ moc_*
 
 # State files not part of the real project
 DBLite.pro.user
+.DS_Store
