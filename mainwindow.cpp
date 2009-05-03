@@ -154,6 +154,7 @@ void MainWindow::loadTableDescription(QString tableName, QString dbIdentifier, Q
             QTreeWidgetItem *column = new QTreeWidgetItem(parent);
             column->setText(0, field.name());
             column->setText(1, getDatabaseType(field));
+            column->setIcon(0, QIcon(":/main/icons/field.png"));
         }
     }
 }
@@ -181,6 +182,7 @@ void MainWindow::reloadTableTree()
     
     // Set the root node to the opened database
     QTreeWidgetItem *root = new QTreeWidgetItem(ui->tableTree, QStringList(dbName), 0);
+    root->setIcon(0, QIcon(":/main/icons/document-database.png"));
 
     // Get all tables and add them in order
     QStringList tables = QSqlDatabase::database(dbIdentifier, true).tables(QSql::AllTables);
@@ -193,6 +195,7 @@ void MainWindow::reloadTableTree()
         QTreeWidgetItem *table = new QTreeWidgetItem(root);
         table->setText(0, tableName);
         table->setText(1, QString::number(getRowCount(tableName, dbIdentifier)));
+        table->setIcon(0, QIcon(":/main/icons/table.png"));
 
         // Load the description for the table
         loadTableDescription(tableName, dbIdentifier, table);
