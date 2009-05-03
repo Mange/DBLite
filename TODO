@@ -1,0 +1,42 @@
+Stuff to do
+===========
+
+Nothing on this list is a gurantee; this is mostly a brainstorming list.
+
+  * Better keyboard shortcuts
+  
+  * Translations
+    * English
+    * Swedish
+    * (More with help from you)
+  
+  * Basic transaction support in the GUI.
+    * Give the user a Transaction button that turns into a "Rollback" and "Commit" pair.
+    * Count affected rows while in a transaction.
+  
+  * Sort the cached result after running the query by clicking at the columns
+  * Drag-and-drop support (drop a database file to open it too)
+  
+  * Configure dialog
+    * Configure syntax highlightning
+      * On/Off
+      * Colors
+    * Configure keyboard shortcuts (?)
+  
+  * Query history
+  
+  * State loading/saving
+    * Most recently used list
+    * Window position, etc.
+    * Load / Save sessions (+ configuration)
+  
+  * Better Mac integration
+    * Proxy icon in title bar
+    * Convert tree view to a Mac-like one when on OS X
+    * Support "Open With..." properly (?)
+    * Don't quit the application when the last window closes
+    * Load Mac-looking icons on OS X (?)
+  
+  * Better Linux integration
+    * KDE theme support (?)
+    

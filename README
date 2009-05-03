@@ -1,0 +1,50 @@
+About DBLite
+============
+
+I was looking for a simple utility to browse SQLite databases with and run queries
+on them for Mac OS X. I could only find crap and/or proprietary software money, so I
+decided to make my own. I had the following goals/objectives:
+    1. K.I.S.S.
+       I don't want it to be a general SQL client. It would be a PITA and hard to
+       support and test. Qt gives the possibility, but I did not want to take it.
+       
+       DBLite should not have any fancy features and built-in query parsing and stuff
+       like that. I'll keep it as a simple query executer and a graphical view of the
+       results.
+       
+    2. Cross-platform
+       I use Linux at home. Mac at work. Says it all. Oh, and the pesky Windows users
+       should be able to be part of the fun, too, if they so choose. BSDs are welcome,
+       too!
+       
+       I will not *support* Windows and the BSDs myself, but they should work there and
+       I will accept patches for them. The reason I don't support them is that I don't
+       have any machines that run BSD and I don't want to buy a Windows license.
+       
+    3. Free as in speech
+       No point in writing software that isn't free, right? I'll release my code under
+       a standard MIT license.
+
+But yeah, it's embarrassing that there no free alternatives. It took me a weekend to
+build this in Qt with C++. I started on friday with no C++ experience and by sunday
+evening, I had a fully functional client for this purpose. I could stop now, bu I
+don't feel like it. I want to add a few more features before naming it "Done".
+
+Please see the TODO file for a list of stugg I indend to add before 1.0.
+
+Current features:
+
+    * Execute queries and look at the result
+      * Show affected rows / rows returned
+      * Shows the returned rows in a simple table based layout
+    * Syntax highlightning in the query edit box
+      * Pretty much full coverage of the SQLite syntax
+    * A tree view of the database
+      * Every table listed with number of rows in them
+      * Tables expand to a list of fields and their type
+        * Type is not "VARCHAR", "INT(6)" and so on since SQLite doesn't store this
+          information, AFAIK. Instead we have "String", "Integer" and "Float".
+          (Date fields are saved as strings internally in SQLite; hard to differentiate here)
+    * Ability to open several databases at the same time in a SDI (Single Document Interface)
+
+Tell me what you think. :-)
