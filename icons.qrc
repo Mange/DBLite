@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/main" >
+        <file>icons/application_exit.png</file>
+        <file>icons/commit.png</file>
+        <file>icons/configure.png</file>
+        <file>icons/document-database.png</file>
+        <file>icons/document-export.png</file>
+        <file>icons/editcopy.png</file>
+        <file>icons/editcut.png</file>
+        <file>icons/editpaste.png</file>
+        <file>icons/exec.png</file>
+        <file>icons/field.png</file>
+        <file>icons/fileclose.png</file>
+        <file>icons/fileopen.png</file>
+        <file>icons/revert.png</file>
+        <file>icons/table.png</file>
+        <file>icons/transaction.png</file>
+        <file>icons/refresh.png</file>
+    </qresource>
+</RCC>

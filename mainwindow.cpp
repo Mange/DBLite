@@ -114,7 +114,6 @@ void MainWindow::resetResultView()
 void MainWindow::setActionStates(bool opened)
 {
     ui->actionExecute_query->setEnabled(opened);
-    ui->executeQueryButton->setEnabled(opened);
     ui->actionReloadTree->setEnabled(opened);
 }
 

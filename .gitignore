@@ -3,6 +3,7 @@
 *.app
 Makefile
 ui_*.h
+qrc_*.cpp
 moc_*
 
 # State files not part of the real project

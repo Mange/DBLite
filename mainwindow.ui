@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>630</width>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,33 +69,6 @@
           <widget class="QPlainTextEdit" name="queryEdit"/>
          </widget>
         </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QPushButton" name="executeQueryButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>E&amp;xecute</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="executeQueryAlignment">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
        </layout>
       </widget>
       <widget class="QTableView" name="resultView"/>
@@ -108,7 +81,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>630</width>
      <height>22</height>
     </rect>
    </property>
@@ -132,6 +105,9 @@
    <addaction name="menu_Database"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -145,6 +121,10 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/main/icons/fileopen.png</normaloff>:/main/icons/fileopen.png</iconset>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -162,6 +142,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/main/icons/exec.png</normaloff>:/main/icons/exec.png</iconset>
+   </property>
    <property name="text">
     <string>Execute query</string>
    </property>
@@ -176,6 +160,10 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/main/icons/fileclose.png</normaloff>:/main/icons/fileclose.png</iconset>
+   </property>
    <property name="text">
     <string>Close</string>
    </property>
@@ -187,6 +175,10 @@
    </property>
   </action>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/main/icons/application_exit.png</normaloff>:/main/icons/application_exit.png</iconset>
+   </property>
    <property name="text">
     <string>Quit</string>
    </property>
@@ -198,6 +190,10 @@
    </property>
   </action>
   <action name="actionReloadTree">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/main/icons/refresh.png</normaloff>:/main/icons/refresh.png</iconset>
+   </property>
    <property name="text">
     <string>Reload tables</string>
    </property>
@@ -210,24 +206,10 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections>
-  <connection>
-   <sender>executeQueryButton</sender>
-   <signal>clicked()</signal>
-   <receiver>actionExecute_query</receiver>
-   <slot>trigger()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>541</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>actionClose</sender>
    <signal>triggered()</signal>
