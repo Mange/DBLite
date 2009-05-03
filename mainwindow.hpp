@@ -30,6 +30,7 @@ private:
     void init();
     bool openFile();
     bool openFile(QString fileName);
+    void setStatusBarMessage(QString message);
     void resetResultView();
     void loadTableDescription(QString tableName, QString dbIdentifier, QTreeWidgetItem *parent);
     QString getDatabaseType(QSqlField field);

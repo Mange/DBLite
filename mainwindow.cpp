@@ -106,6 +106,11 @@ bool MainWindow::openFile(QString path)
     }
 }
 
+void MainWindow::setStatusBarMessage(QString message)
+{
+    this->statusBar()->showMessage(message);
+}
+
 void MainWindow::resetResultView()
 {
     delete ui->resultView->model();
@@ -221,13 +226,24 @@ void MainWindow::on_actionExecute_query_triggered()
                         arg(model->lastError().databaseText())
         );
     }
-    else if (model->query().isSelect())
-    {
-        emit setStatusTip(tr("Fetched %1 rows").arg(model->query().size()));
-    }
     else
     {
-        emit setStatusTip(tr("Affected %1 rows").arg(model->query().numRowsAffected()));
+        int rows = 0;
+        char *message;
+        if (model->query().isSelect())
+        {
+            // If QSQLITE would have feature QSqlDriver::QuerySize, we could use
+            //    model->query().size()
+            // but for now, we'll have to settle for this
+            rows = model->rowCount();
+            message = "Query returned %n row(s)";
+        }
+        else
+        {
+            rows = model->query().numRowsAffected();
+            message = "Query affected %n row(s)";
+        }
+        setStatusBarMessage(tr(message, "", rows));
     }
 }
 
