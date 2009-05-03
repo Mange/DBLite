@@ -5,8 +5,13 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     // Check if we have any DB drivers ready
-    if( QSqlDatabase::drivers().isEmpty() ) {
-        QMessageBox::critical(this, tr("No database engines found!"), tr("No Qt Dabase plugins found. You need some drivers to connect to an source."));
+    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) ) {
+        QMessageBox::critical(
+                this,
+                tr("SQLite database driver not found"),
+                tr("Could not find the Qt database driver QSQLITE in the system. You need"
+                   "this source to connect to SQLite databases.")
+        );
         exit(1);
     }
 
@@ -15,8 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    //resetResultView();
-    //delete ui;
 }
 
 bool MainWindow::valid()
