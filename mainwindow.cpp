@@ -29,6 +29,8 @@ MainWindow::~MainWindow()
 {
 }
 
+/* Methods */
+
 bool MainWindow::valid()
 {
     return dbPath != QString();
@@ -51,21 +53,6 @@ void MainWindow::init()
     connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
 
     emit initialized();
-}
-
-void MainWindow::initialized()
-{
-    // Check if we have any DB drivers ready
-    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) )
-    {
-        QMessageBox::critical(
-                this,
-                tr("SQLite database driver not found"),
-                tr("Could not find the Qt database driver QSQLITE in the system. You need"
-                   "this source to connect to SQLite databases.")
-        );
-        exit(1);
-    }
 }
 
 bool MainWindow::openFile()
@@ -119,16 +106,21 @@ void MainWindow::resetResultView()
     delete ui->resultView->model();
 }
 
-void MainWindow::setActionStates(bool opened)
+void MainWindow::loadTableDescription(QString tableName, QString dbIdentifier, QTreeWidgetItem *parent)
 {
-    ui->actionExecute_query->setEnabled(opened);
-    ui->actionReloadTree->setEnabled(opened);
-}
+    QSqlRecord record = QSqlDatabase::database(dbIdentifier).record(tableName);
+    if (record.count() > 0)
+    {
+        for(int i = 0; i < record.count(); i++)
+        {
+            QSqlField field = record.field(i);
 
-void MainWindow::updateTitle()
-{
-    // Title of the main window. Database name will be expanded at position 1
-    this->setWindowTitle(tr("DBLite - %1").arg(dbName));
+            QTreeWidgetItem *column = new QTreeWidgetItem(parent);
+            column->setText(0, field.name());
+            column->setText(1, getDatabaseType(field));
+            column->setIcon(0, QIcon(":/main/icons/field.png"));
+        }
+    }
 }
 
 QString MainWindow::getDatabaseType(QSqlField field)
@@ -150,23 +142,6 @@ QString MainWindow::getDatabaseType(QSqlField field)
     }
 }
 
-void MainWindow::loadTableDescription(QString tableName, QString dbIdentifier, QTreeWidgetItem *parent)
-{
-    QSqlRecord record = QSqlDatabase::database(dbIdentifier).record(tableName);
-    if (record.count() > 0)
-    {
-        for(int i = 0; i < record.count(); i++)
-        {
-            QSqlField field = record.field(i);
-
-            QTreeWidgetItem *column = new QTreeWidgetItem(parent);
-            column->setText(0, field.name());
-            column->setText(1, getDatabaseType(field));
-            column->setIcon(0, QIcon(":/main/icons/field.png"));
-        }
-    }
-}
-
 int MainWindow::getRowCount(QString tableName, QString dbIdentifier)
 {
     QSqlQuery query(QSqlDatabase::database(dbIdentifier));
@@ -180,12 +155,41 @@ int MainWindow::getRowCount(QString tableName, QString dbIdentifier)
     return -1;
 }
 
+/* Slots */
+
+void MainWindow::initialized()
+{
+    // Check if we have any DB drivers ready
+    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) )
+    {
+        QMessageBox::critical(
+                this,
+                tr("SQLite database driver not found"),
+                tr("Could not find the Qt database driver QSQLITE in the system. You need"
+                   "this source to connect to SQLite databases.")
+        );
+        exit(1);
+    }
+}
+
+void MainWindow::updateTitle()
+{
+    // Title of the main window. Database name will be expanded at position 1
+    this->setWindowTitle(tr("DBLite - %1").arg(dbName));
+}
+
+void MainWindow::setActionStates(bool opened)
+{
+    ui->actionExecute_query->setEnabled(opened);
+    ui->actionReloadTree->setEnabled(opened);
+}
+
 void MainWindow::reloadTableTree()
 {
     ui->tableTree->clear();
     if (dbName == QString())
         return;
-    
+
     // Set the root node to the opened database
     QTreeWidgetItem *root = new QTreeWidgetItem(ui->tableTree, QStringList(dbName), 0);
     root->setIcon(0, QIcon(":/main/icons/document-database.png"));
@@ -203,6 +207,14 @@ void MainWindow::reloadTableTree()
         // Load the description for the table
         loadTableDescription(tableName, dbIdentifier, table);
     }
+}
+
+void MainWindow::on_actionQuit_triggered()
+{
+    // Close everything and quit
+    // TODO: We should loop over all windows here, I guess.
+    ui->actionClose->trigger();
+    emit close();
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -250,12 +262,4 @@ void MainWindow::on_actionExecute_query_triggered()
         message = "Query affected %n row(s)";
     }
     setStatusBarMessage(tr(message, "", rows));
-}
-
-void MainWindow::on_actionQuit_triggered()
-{
-    // Close everything and quit
-    // TODO: We should loop over all windows here, I guess.
-    ui->actionClose->trigger();
-    emit close();
 }
