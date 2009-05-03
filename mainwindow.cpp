@@ -1,21 +1,36 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
+MainWindow::MainWindow(QString fileName, QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow)
+{
+    init();
+
+    // Open the given file
+    if(!openFile(fileName))
+    {
+        emit close();
+    }
+    else
+    {
+        emit openedStatusChanged(true);
+    }
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-    // Check if we have any DB drivers ready
-    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) ) {
-        QMessageBox::critical(
-                this,
-                tr("SQLite database driver not found"),
-                tr("Could not find the Qt database driver QSQLITE in the system. You need"
-                   "this source to connect to SQLite databases.")
-        );
-        exit(1);
-    }
-
     init();
+
+    // Prompt the user for a file
+    if(!openFile())
+    {
+        emit close();
+    }
+    else
+    {
+        emit openedStatusChanged(true);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -48,13 +63,15 @@ void MainWindow::init()
 
 void MainWindow::initialized()
 {
-    if(!openFile())
-    {
-        emit close();
-    }
-    else
-    {
-        emit openedStatusChanged(true);
+    // Check if we have any DB drivers ready
+    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) ) {
+        QMessageBox::critical(
+                this,
+                tr("SQLite database driver not found"),
+                tr("Could not find the Qt database driver QSQLITE in the system. You need"
+                   "this source to connect to SQLite databases.")
+        );
+        exit(1);
     }
 }
 

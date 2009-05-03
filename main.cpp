@@ -2,7 +2,7 @@
 #include "mainwindow.hpp"
 
 int main(int argc, char *argv[])
-{
+{    
     QApplication a(argc, argv);
     a.setApplicationName("DBLite");
 
@@ -21,7 +21,19 @@ int main(int argc, char *argv[])
     rootMenu->addAction(quitAction);
 #endif
 
-    MainWindow *w = new MainWindow();
+    MainWindow *w;
+
+    // Look for command line arguments
+    QStringList arguments = a.arguments();
+    if (arguments.size() > 1)
+    {
+        w = new MainWindow(arguments[1]);
+    }
+    else
+    {
+        w = new MainWindow();
+    }
+
     if (w->valid())
     {
         w->show();
