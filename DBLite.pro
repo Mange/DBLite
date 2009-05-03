@@ -12,4 +12,5 @@ HEADERS += mainwindow.hpp \
     sqlhighlighter.hpp
 FORMS += mainwindow.ui
 RESOURCES += resources.qrc
-OTHER_FILES += highlighter/sql_keywords.txt
+OTHER_FILES += highlighter/sql_keywords.txt \
+    highlighter/sql_functions.txt

@@ -17,5 +17,6 @@
         <file>icons/transaction.png</file>
         <file>icons/refresh.png</file>
         <file>highlighter/sql_keywords.txt</file>
+        <file>highlighter/sql_functions.txt</file>
     </qresource>
 </RCC>
