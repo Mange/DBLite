@@ -21,7 +21,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = 0);
-    MainWindow(QString fileName, QWidget *parent);
+    MainWindow(QString fileName, QWidget *parent = 0);
     ~MainWindow();
 
     // Returns true when a file has been opened. Use this before displaying a new window to
