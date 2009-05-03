@@ -6,7 +6,10 @@ QT += sql \
 TARGET = DBLite
 TEMPLATE = app
 SOURCES += main.cpp \
-    mainwindow.cpp
-HEADERS += mainwindow.hpp
+    mainwindow.cpp \
+    sqlhighlighter.cpp
+HEADERS += mainwindow.hpp \
+    sqlhighlighter.hpp
 FORMS += mainwindow.ui
-RESOURCES += icons.qrc
+RESOURCES += resources.qrc
+OTHER_FILES += highlighter/sql_keywords.txt

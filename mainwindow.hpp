@@ -6,6 +6,8 @@
 #include <QtGui>
 #include <QtSql>
 
+#include "sqlhighlighter.hpp"
+
 namespace Ui
 {
     class MainWindow;
@@ -41,6 +43,8 @@ private:
     QString dbIdentifier;
     QString dbName;
     QString dbPath;
+
+    SqlHighlighter *highlighter;
 
 signals:
     void openedStatusChanged(bool);

@@ -30,6 +30,7 @@ bool MainWindow::valid()
 void MainWindow::init()
 {
     ui->setupUi(this);
+    highlighter = new SqlHighlighter(ui->queryEdit->document());
 
     setAttribute(Qt::WA_DeleteOnClose);
     setUnifiedTitleAndToolBarOnMac(true);
@@ -124,6 +125,7 @@ void MainWindow::setActionStates(bool opened)
 
 void MainWindow::updateTitle()
 {
+    // Title of the main window. Database name will be expanded at position 1
     this->setWindowTitle(tr("DBLite - %1").arg(dbName));
 }
 
@@ -132,12 +134,16 @@ QString MainWindow::getDatabaseType(QSqlField field)
     switch(field.type())
     {
         case QVariant::String:
+            // Field type
             return tr("String");
         case QVariant::Int:
+            // Field type
             return tr("Integer");
         case QVariant::Double:
+            // Field type
             return tr("Real");
         default:
+            // Field type
             return tr("Unknown type: %1").arg(field.type());
     }
 }
