@@ -8,13 +8,9 @@ MainWindow::MainWindow(QString fileName, QWidget *parent)
 
     // Open the given file
     if(!openFile(fileName))
-    {
         emit close();
-    }
     else
-    {
         emit openedStatusChanged(true);
-    }
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -24,13 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Prompt the user for a file
     if(!openFile())
-    {
         emit close();
-    }
     else
-    {
         emit openedStatusChanged(true);
-    }
 }
 
 MainWindow::~MainWindow()
@@ -64,7 +56,8 @@ void MainWindow::init()
 void MainWindow::initialized()
 {
     // Check if we have any DB drivers ready
-    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) ) {
+    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) )
+    {
         QMessageBox::critical(
                 this,
                 tr("SQLite database driver not found"),
@@ -79,19 +72,14 @@ bool MainWindow::openFile()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Open database"));
     if (path != QString())
-    {
         return openFile(path);
-    }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 bool MainWindow::openFile(QString path)
 {
-    dbPath = path;
-    dbName = QFileInfo(dbPath).fileName();
+    dbPath       = path;
+    dbName       = QFileInfo(dbPath).fileName();
     dbIdentifier = QString("opened_db_%1").arg(dbName);
 
     // Check if we already have the connection opened and reuse in that case
@@ -111,17 +99,14 @@ bool MainWindow::openFile(QString path)
         QMessageBox::warning(
                 this,
                 tr("Unable to open database"),
-                tr("An error occurred while opening the connection: ") + db.lastError().text()
-                );
-        dbName = QString();
-        dbPath = QString();
+                tr("An error occurred while opening the connection: %1").arg(db.lastError().text())
+        );
+        dbName       = QString();
+        dbPath       = QString();
         dbIdentifier = QString();
         return false;
     }
-    else
-    {
-        return true;
-    }
+    return true;
 }
 
 void MainWindow::setStatusBarMessage(QString message)
@@ -192,16 +177,14 @@ int MainWindow::getRowCount(QString tableName, QString dbIdentifier)
         query.finish();
         return count;
     }
-    else
-    {
-        return -1;
-    }
+    return -1;
 }
 
 void MainWindow::reloadTableTree()
 {
     ui->tableTree->clear();
-    if (dbName == QString()) { return; }
+    if (dbName == QString())
+        return;
     
     // Set the root node to the opened database
     QTreeWidgetItem *root = new QTreeWidgetItem(ui->tableTree, QStringList(dbName), 0);
@@ -209,11 +192,8 @@ void MainWindow::reloadTableTree()
 
     // Get all tables and add them in order
     QStringList tables = QSqlDatabase::database(dbIdentifier, true).tables(QSql::AllTables);
-    QStringList::const_iterator constIterator;
-    for(constIterator = tables.begin(); constIterator != tables.end(); constIterator++)
+    foreach (QString tableName, tables)
     {
-        QString tableName = (*constIterator);
-
         // Give a random row count for now
         QTreeWidgetItem *table = new QTreeWidgetItem(root);
         table->setText(0, tableName);
@@ -251,31 +231,31 @@ void MainWindow::on_actionExecute_query_triggered()
                         arg(model->lastError().number()).
                         arg(model->lastError().databaseText())
         );
+        return;
+    }
+
+    int rows = 0;
+    char *message;
+    if (model->query().isSelect())
+    {
+        // If QSQLITE would have feature QSqlDriver::QuerySize, we could use
+        //    model->query().size()
+        // but for now, we'll have to settle for this
+        rows = model->rowCount();
+        message = "Query returned %n row(s)";
     }
     else
     {
-        int rows = 0;
-        char *message;
-        if (model->query().isSelect())
-        {
-            // If QSQLITE would have feature QSqlDriver::QuerySize, we could use
-            //    model->query().size()
-            // but for now, we'll have to settle for this
-            rows = model->rowCount();
-            message = "Query returned %n row(s)";
-        }
-        else
-        {
-            rows = model->query().numRowsAffected();
-            message = "Query affected %n row(s)";
-        }
-        setStatusBarMessage(tr(message, "", rows));
+        rows = model->query().numRowsAffected();
+        message = "Query affected %n row(s)";
     }
+    setStatusBarMessage(tr(message, "", rows));
 }
 
 void MainWindow::on_actionQuit_triggered()
 {
     // Close everything and quit
+    // TODO: We should loop over all windows here, I guess.
     ui->actionClose->trigger();
     emit close();
 }
