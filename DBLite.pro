@@ -16,3 +16,7 @@ FORMS += mainwindow.ui
 RESOURCES += resources.qrc
 OTHER_FILES += highlighter/sql_keywords.txt \
     highlighter/sql_functions.txt
+
+# Compile .o files to a separate dir
+OBJECTS_DIR = objs/
+DESTDIR = bin/
