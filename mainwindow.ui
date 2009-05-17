@@ -48,15 +48,6 @@
        <attribute name="headerStretchLastSection">
         <bool>false</bool>
        </attribute>
-       <attribute name="headerDefaultSectionSize">
-        <number>120</number>
-       </attribute>
-       <attribute name="headerShowSortIndicator" stdset="0">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="headerStretchLastSection">
-        <bool>false</bool>
-       </attribute>
        <column>
         <property name="text">
          <string>Table</string>
@@ -108,14 +99,23 @@
      <x>0</x>
      <y>0</y>
      <width>630</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuOpenRecent">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Open recent</string>
+     </property>
+    </widget>
     <addaction name="actionOpen"/>
+    <addaction name="menuOpenRecent"/>
     <addaction name="actionClose"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -148,7 +148,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/main/icons/fileopen.png</normaloff>:/main/icons/fileopen.png</iconset>
    </property>
    <property name="text">
@@ -169,7 +169,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/main/icons/exec.png</normaloff>:/main/icons/exec.png</iconset>
    </property>
    <property name="text">
@@ -187,7 +187,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/main/icons/fileclose.png</normaloff>:/main/icons/fileclose.png</iconset>
    </property>
    <property name="text">
@@ -202,7 +202,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/main/icons/application_exit.png</normaloff>:/main/icons/application_exit.png</iconset>
    </property>
    <property name="text">
@@ -217,7 +217,7 @@
   </action>
   <action name="actionReloadTree">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/main/icons/refresh.png</normaloff>:/main/icons/refresh.png</iconset>
    </property>
    <property name="text">
@@ -233,7 +233,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="icons.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections>
   <connection>

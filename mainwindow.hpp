@@ -24,6 +24,9 @@ public:
     MainWindow(QString fileName, QWidget *parent = 0);
     ~MainWindow();
 
+    // Open a new window. Returns if successful or not.
+    bool openNewWindow(QString fileName = QString());
+
     // Returns true when a file has been opened. Use this before displaying a new window to
     // know if the user actually opened a file or if the window is about to autoclose.
     bool valid();
@@ -36,10 +39,10 @@ private:
 
     // Prompts the user for a database file to open and then open it
     // TODO: Rename to something better
-    bool openFile();
+    bool openFile(bool newWindow = false);
 
     // Open a given database
-    bool openFile(QString fileName);
+    bool openFile(QString fileName, bool newWindow = false);
 
     // Helper method for setting message in status bar
     void setStatusBarMessage(QString message);
@@ -84,10 +87,16 @@ private:
 
     SqlHighlighter *highlighter;
 
+    unsigned short maxMruItems;
+    QList<QAction*> mruActions;
+
 signals:
     // Emitted when a file is opened or closed. As good as deprecrated
     // by now.
     void openedStatusChanged(bool);
+
+    // Emitted when the recently used files list was changed
+    void mruChanged();
 
     // TODO: Add a signal for query about the be executed (before)
     // TODO: Add a signal for queries doing changes to the database (after)
@@ -108,6 +117,17 @@ private slots:
     // Update all the actions and their statuses.
     // As good as deprecrated by now.
     void setActionStates(bool);
+
+    // Open a recently opened file. The file itself will be derived from the sender action's data
+    bool openRecentFile();
+
+    // Updates recently used list. The currently opened file will be appended to the list,
+    // and the setting saved
+    void pushToMruList();
+
+    // Refreshes the recently used list in the UI. Only updates all the actions in the menu
+    // from the settings, nothing more.
+    void refreshMruList();
 
     // Clears and readds information about the tables in the tree view
     // TODO: Make this a bit better by actually just updating instead of destroying/rebuilding

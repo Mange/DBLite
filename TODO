@@ -22,11 +22,11 @@ Nothing on this list is a gurantee; this is mostly a brainstorming list.
       * On/Off
       * Colors
     * Configure keyboard shortcuts (?)
+    * Open most recent file on startup
   
   * Query history
   
   * State loading/saving
-    * Most recently used list
     * Window position, etc.
     * Load / Save sessions (+ configuration)
   

@@ -31,6 +31,21 @@ MainWindow::~MainWindow()
 
 /* Methods */
 
+bool MainWindow::openNewWindow(QString filename)
+{
+    MainWindow *other;
+    if (filename == QString())
+        other = new MainWindow();
+    else
+        other = new MainWindow(filename);
+
+    if (other->valid())
+    {
+        other->move(this->x() + 10, this->y() + 10);
+        other->show();
+    }
+}
+
 bool MainWindow::valid()
 {
     return dbPath != QString();
@@ -44,27 +59,48 @@ void MainWindow::init()
     setAttribute(Qt::WA_DeleteOnClose);
     setUnifiedTitleAndToolBarOnMac(true);
     dbIdentifier = QString();
+    maxMruItems = 5;
+
+    // Create mru actions
+    //mruActions = QList<QAction*>();
+    for (unsigned short i = 0; i < maxMruItems; i++)
+    {
+        mruActions << new QAction(this);
+        mruActions[i]->setVisible(false);
+        ui->menuOpenRecent->addAction(mruActions[i]);
+        connect(mruActions[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
+    }
 
     // Connect slots
     connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(updateTitle()));
     connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(setActionStates(bool)));
     connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(reloadTableTree()));
 
+    // TODO: Fix a better signal :-(
+    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(pushToMruList()));
+    connect(this, SIGNAL(mruChanged()), this, SLOT(refreshMruList()));
+
     connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
 
     emit initialized();
 }
 
-bool MainWindow::openFile()
+bool MainWindow::openFile(bool newWindow)
 {
+    if (newWindow)
+        return openNewWindow();
+
     QString path = QFileDialog::getOpenFileName(this, tr("Open database"));
     if (path != QString())
         return openFile(path);
     return false;
 }
 
-bool MainWindow::openFile(QString path)
+bool MainWindow::openFile(QString path, bool newWindow)
 {
+    if (newWindow)
+        return openNewWindow(path);
+
     dbPath       = path;
     dbName       = QFileInfo(dbPath).fileName();
     dbIdentifier = QString("opened_db_%1").arg(dbName);
@@ -184,6 +220,55 @@ void MainWindow::setActionStates(bool opened)
     ui->actionReloadTree->setEnabled(opened);
 }
 
+bool MainWindow::openRecentFile()
+{
+    QAction *senderAction = qobject_cast<QAction*>(sender());
+    if (senderAction)
+        return openFile(senderAction->data().toString(), true);
+    return false;
+}
+
+void MainWindow::pushToMruList()
+{
+    QSettings settings("Magnus Bergmark", "DBLite", this);
+    QStringList files = settings.value("Recent files").toStringList();
+
+    // FIXME: Just reorder when we push a path already there
+    files.push_front(dbPath);
+    while(files.size() > maxMruItems)
+        files.removeLast();
+
+    settings.setValue("Recent files", files);
+
+    emit mruChanged();
+}
+
+void MainWindow::refreshMruList()
+{
+    QSettings settings("Magnus Bergmark", "DBLite", this);
+    QStringList files = settings.value("Recent files").toStringList();
+
+    // Make sure we don't iterate too far
+    unsigned short actionsCount = qMin(files.size(), mruActions.size());
+
+    // Update the data, titles, etc. for all the actions
+    for (unsigned short i = 0; i < actionsCount; i++)
+    {
+        mruActions[i]->setData(files[i]);
+        mruActions[i]->setText(QFileInfo(files[i]).fileName());
+        mruActions[i]->setVisible(true);
+    }
+
+    // Hide the rest
+    for (unsigned short i = actionsCount; i < mruActions.size(); i++)
+    {
+        mruActions[i]->setVisible(false);
+    }
+
+    // Enable the submenu if we had any files visible
+    ui->menuOpenRecent->setEnabled(actionsCount > 0);
+}
+
 void MainWindow::reloadTableTree()
 {
     ui->tableTree->clear();
@@ -219,12 +304,7 @@ void MainWindow::on_actionQuit_triggered()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    MainWindow *other = new MainWindow();
-    if (other->valid())
-    {
-        other->move(this->x() + 10, this->y() + 10);
-        other->show();
-    }
+    openNewWindow();
 }
 
 void MainWindow::on_actionExecute_query_triggered()
@@ -247,7 +327,7 @@ void MainWindow::on_actionExecute_query_triggered()
     }
 
     int rows = 0;
-    char *message;
+    const char *message;
     if (model->query().isSelect())
     {
         // If QSQLITE would have feature QSqlDriver::QuerySize, we could use
