@@ -5,7 +5,8 @@ MainWindow::MainWindow(QString filename, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     init();
-    loadFile(filename);
+    if (!filename.isEmpty())
+        loadFile(filename);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -48,17 +49,11 @@ void MainWindow::init()
     connect(this, SIGNAL(mruChanged()), this, SLOT(refreshMruList()));
 
     connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
+    connect(ui->actionNewWindow,  SIGNAL(triggered()), this, SLOT(openNewWindow()));
 
     updateTitle();
     setActionStates();
     refreshMruList();
-}
-
-void MainWindow::openNewWindow(QString filename)
-{
-    MainWindow *other = new MainWindow(filename);
-    other->move(this->x() + 20, this->y() + 20);
-    other->show();
 }
 
 QString MainWindow::askForFilename()
@@ -110,7 +105,6 @@ void MainWindow::setActionStates()
 {
     bool opened = openedFile.valid();
 
-    ui->actionClose->setEnabled(opened);
     ui->actionExecute_query->setEnabled(opened);
     ui->actionReloadTree->setEnabled(opened);
 }
@@ -126,6 +120,13 @@ void MainWindow::openRecentFile()
         else
             loadFile(filename);
     }
+}
+
+void MainWindow::openNewWindow(QString filename)
+{
+    MainWindow *other = new MainWindow(filename);
+    other->move(this->x() + 20, this->y() + 20);
+    other->show();
 }
 
 void MainWindow::pushToMruList()

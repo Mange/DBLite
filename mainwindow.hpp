@@ -39,10 +39,6 @@ private:
     // Helper method to keep common constructor logic in one place
     void init();
 
-    // Open a new window with the given file name loaded. Use this instead of creating a
-    // new window with the constructor yourself.
-    void openNewWindow(QString filename = QString());
-
     // Returns a QString to a path chosen by the user. If the user aborted, the null string will be returned
     QString askForFilename();
 
@@ -81,6 +77,9 @@ private slots:
 
     // Open a recently opened file. The file itself will be derived from the sender action's data
     void openRecentFile();
+
+    // Open a new window with the given file name loaded.
+    void openNewWindow(QString filename = QString());
 
     // Updates recently used list. The currently opened file will be appended to the list,
     // and the setting saved
