@@ -1,28 +1,17 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QString fileName, QWidget *parent)
+MainWindow::MainWindow(QString filename, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     init();
-
-    // Open the given file
-    if(!openFile(fileName))
-        emit close();
-    else
-        emit openedStatusChanged(true);
+    loadFile(filename);
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     init();
-
-    // Prompt the user for a file
-    if(!openFile())
-        emit close();
-    else
-        emit openedStatusChanged(true);
 }
 
 MainWindow::~MainWindow()
@@ -31,26 +20,6 @@ MainWindow::~MainWindow()
 
 /* Methods */
 
-bool MainWindow::openNewWindow(QString filename)
-{
-    MainWindow *other;
-    if (filename == QString())
-        other = new MainWindow();
-    else
-        other = new MainWindow(filename);
-
-    if (other->valid())
-    {
-        other->move(this->x() + 10, this->y() + 10);
-        other->show();
-    }
-}
-
-bool MainWindow::valid()
-{
-    return dbPath != QString();
-}
-
 void MainWindow::init()
 {
     ui->setupUi(this);
@@ -58,7 +27,6 @@ void MainWindow::init()
 
     setAttribute(Qt::WA_DeleteOnClose);
     setUnifiedTitleAndToolBarOnMac(true);
-    dbIdentifier = QString();
     maxMruItems = 5;
 
     // Create mru actions
@@ -72,64 +40,50 @@ void MainWindow::init()
     }
 
     // Connect slots
-    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(updateTitle()));
-    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(setActionStates(bool)));
-    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(reloadTableTree()));
+    connect(this, SIGNAL(fileOpened()), this, SLOT(updateTitle()));
+    connect(this, SIGNAL(fileOpened()), this, SLOT(setActionStates()));
+    connect(this, SIGNAL(fileOpened()), this, SLOT(reloadTableTree()));
 
-    // TODO: Fix a better signal :-(
-    connect(this, SIGNAL(openedStatusChanged(bool)), this, SLOT(pushToMruList()));
+    connect(this, SIGNAL(fileOpened()), this, SLOT(pushToMruList()));
     connect(this, SIGNAL(mruChanged()), this, SLOT(refreshMruList()));
 
     connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
 
-    emit initialized();
+    updateTitle();
+    setActionStates();
+    refreshMruList();
 }
 
-bool MainWindow::openFile(bool newWindow)
+void MainWindow::openNewWindow(QString filename)
 {
-    if (newWindow)
-        return openNewWindow();
-
-    QString path = QFileDialog::getOpenFileName(this, tr("Open database"));
-    if (path != QString())
-        return openFile(path);
-    return false;
+    MainWindow *other = new MainWindow(filename);
+    other->move(this->x() + 20, this->y() + 20);
+    other->show();
 }
 
-bool MainWindow::openFile(QString path, bool newWindow)
+QString MainWindow::askForFilename()
 {
-    if (newWindow)
-        return openNewWindow(path);
+    return QFileDialog::getOpenFileName(this, tr("Open database file"));
+}
 
-    dbPath       = path;
-    dbName       = QFileInfo(dbPath).fileName();
-    dbIdentifier = QString("opened_db_%1").arg(dbName);
-
-    // Check if we already have the connection opened and reuse in that case
-    QSqlDatabase db;
-    if (QSqlDatabase::connectionNames().contains(dbIdentifier))
+bool MainWindow::loadFile(QString filename)
+{
+    openedFile.open(filename);
+    if(openedFile.valid())
     {
-        db = QSqlDatabase::database(dbIdentifier);
+        emit fileOpened();
+        return true;
     }
     else
-    {
-        db = QSqlDatabase::addDatabase("QSQLITE", dbIdentifier);
-        db.setDatabaseName(dbPath);
-    }
-
-    if (!db.open())
     {
         QMessageBox::warning(
                 this,
                 tr("Unable to open database"),
-                tr("An error occurred while opening the connection: %1").arg(db.lastError().text())
+                tr("An error occurred while opening the database file: %1").
+                    arg(openedFile.lastError())
         );
-        dbName       = QString();
-        dbPath       = QString();
-        dbIdentifier = QString();
         return false;
     }
-    return true;
 }
 
 void MainWindow::setStatusBarMessage(QString message)
@@ -142,90 +96,36 @@ void MainWindow::resetResultView()
     delete ui->resultView->model();
 }
 
-void MainWindow::loadTableDescription(QString tableName, QString dbIdentifier, QTreeWidgetItem *parent)
-{
-    QSqlRecord record = QSqlDatabase::database(dbIdentifier).record(tableName);
-    if (record.count() > 0)
-    {
-        for(int i = 0; i < record.count(); i++)
-        {
-            QSqlField field = record.field(i);
-
-            QTreeWidgetItem *column = new QTreeWidgetItem(parent);
-            column->setText(0, field.name());
-            column->setText(1, getDatabaseType(field));
-            column->setIcon(0, QIcon(":/main/icons/field.png"));
-        }
-    }
-}
-
-QString MainWindow::getDatabaseType(QSqlField field)
-{
-    switch(field.type())
-    {
-        case QVariant::String:
-            // Field type
-            return tr("String");
-        case QVariant::Int:
-            // Field type
-            return tr("Integer");
-        case QVariant::Double:
-            // Field type
-            return tr("Real");
-        default:
-            // Field type
-            return tr("Unknown type: %1").arg(field.type());
-    }
-}
-
-int MainWindow::getRowCount(QString tableName, QString dbIdentifier)
-{
-    QSqlQuery query(QSqlDatabase::database(dbIdentifier));
-    if (query.exec(QString("SELECT COUNT(*) FROM %1").arg(tableName)))
-    {
-        query.first();
-        int count = query.value(0).toInt();
-        query.finish();
-        return count;
-    }
-    return -1;
-}
-
 /* Slots */
-
-void MainWindow::initialized()
-{
-    // Check if we have any DB drivers ready
-    if( !QSqlDatabase::drivers().contains("QSQLITE", Qt::CaseInsensitive) )
-    {
-        QMessageBox::critical(
-                this,
-                tr("SQLite database driver not found"),
-                tr("Could not find the Qt database driver QSQLITE in the system. You need"
-                   "this source to connect to SQLite databases.")
-        );
-        exit(1);
-    }
-}
 
 void MainWindow::updateTitle()
 {
-    // Title of the main window. Database name will be expanded at position 1
-    this->setWindowTitle(tr("DBLite - %1").arg(dbName));
+    if (openedFile.valid())
+        this->setWindowTitle(tr("DBLite - %1").arg(openedFile.fileName()));
+    else
+        this->setWindowTitle(tr("DBLite"));
 }
 
-void MainWindow::setActionStates(bool opened)
+void MainWindow::setActionStates()
 {
+    bool opened = openedFile.valid();
+
+    ui->actionClose->setEnabled(opened);
     ui->actionExecute_query->setEnabled(opened);
     ui->actionReloadTree->setEnabled(opened);
 }
 
-bool MainWindow::openRecentFile()
+void MainWindow::openRecentFile()
 {
     QAction *senderAction = qobject_cast<QAction*>(sender());
     if (senderAction)
-        return openFile(senderAction->data().toString(), true);
-    return false;
+    {
+        QString filename = senderAction->data().toString();
+        if (openedFile.valid())
+            openNewWindow(filename);
+        else
+            loadFile(filename);
+    }
 }
 
 void MainWindow::pushToMruList()
@@ -234,7 +134,7 @@ void MainWindow::pushToMruList()
     QStringList files = settings.value("Recent files").toStringList();
 
     // FIXME: Just reorder when we push a path already there
-    files.push_front(dbPath);
+    files.push_front(openedFile.fullFileName());
     while(files.size() > maxMruItems)
         files.removeLast();
 
@@ -272,26 +172,38 @@ void MainWindow::refreshMruList()
 void MainWindow::reloadTableTree()
 {
     ui->tableTree->clear();
-    if (dbName == QString())
+    if (!openedFile.valid())
         return;
 
     // Set the root node to the opened database
-    QTreeWidgetItem *root = new QTreeWidgetItem(ui->tableTree, QStringList(dbName), 0);
+    QTreeWidgetItem *root = new QTreeWidgetItem(ui->tableTree);
+    root->setText(0, openedFile.fileName());
     root->setIcon(0, QIcon(":/main/icons/document-database.png"));
 
     // Get all tables and add them in order
-    QStringList tables = QSqlDatabase::database(dbIdentifier, true).tables(QSql::AllTables);
+    QStringList tables = openedFile.getTables();
     foreach (QString tableName, tables)
     {
-        // Give a random row count for now
+        int rowCount = openedFile.getRowCount(tableName);
+
         QTreeWidgetItem *table = new QTreeWidgetItem(root);
         table->setText(0, tableName);
-        table->setText(1, QString::number(getRowCount(tableName, dbIdentifier)));
+        table->setText(1, QString::number(rowCount));
         table->setIcon(0, QIcon(":/main/icons/table.png"));
 
-        // Load the description for the table
-        loadTableDescription(tableName, dbIdentifier, table);
+        // Add all fields for the table
+        QList<DbField> fields = openedFile.getFields(tableName);
+        foreach(DbField fieldInfo, fields)
+        {
+            QTreeWidgetItem *field = new QTreeWidgetItem(table);
+            field->setText(0, fieldInfo.first);
+            field->setText(1, fieldInfo.second);
+            field->setIcon(0, QIcon(":/main/icons/field.png"));
+        }
     }
+
+    // Pre-expand root node
+    root->setExpanded(true);
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -304,14 +216,17 @@ void MainWindow::on_actionQuit_triggered()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    openNewWindow();
+    if (openedFile.valid())
+        openNewWindow(askForFilename());
+    else
+        loadFile(askForFilename());
 }
 
 void MainWindow::on_actionExecute_query_triggered()
 {
     resetResultView();
     QSqlQueryModel *model = new QSqlQueryModel(ui->resultView);
-    model->setQuery(ui->queryEdit->toPlainText(), QSqlDatabase::database(dbIdentifier));
+    openedFile.executeQuery(ui->queryEdit->toPlainText(), model);
     ui->resultView->setModel(model);
 
     if (model->lastError().type() != QSqlError::NoError)
@@ -326,20 +241,17 @@ void MainWindow::on_actionExecute_query_triggered()
         return;
     }
 
-    int rows = 0;
-    const char *message;
+    QString message;
     if (model->query().isSelect())
     {
         // If QSQLITE would have feature QSqlDriver::QuerySize, we could use
         //    model->query().size()
         // but for now, we'll have to settle for this
-        rows = model->rowCount();
-        message = "Query returned %n row(s)";
+        message = tr("Query returned %n row(s)", "", model->rowCount());
     }
     else
     {
-        rows = model->query().numRowsAffected();
-        message = "Query affected %n row(s)";
+        message = tr("Query affected %n row(s)", "", model->query().numRowsAffected());
     }
-    setStatusBarMessage(tr(message, "", rows));
+    setStatusBarMessage(message);
 }

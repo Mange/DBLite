@@ -30,14 +30,6 @@ int main(int argc, char *argv[])
     else
         w = new MainWindow();
 
-    // If the user tried to open a file and it failed (cancelled, etc.)
-    // valid will be false and the window is about to destroy itself.
-    // Don't try to display it in that case.
-    if (w->valid())
-    {
-        w->show();
-        return a.exec();
-    }
-
-    return 0;
+    w->show();
+    return a.exec();
 }

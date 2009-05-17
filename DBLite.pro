@@ -7,9 +7,11 @@ TARGET = DBLite
 TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
-    sqlhighlighter.cpp
+    sqlhighlighter.cpp \
+    databasefile.cpp
 HEADERS += mainwindow.hpp \
-    sqlhighlighter.hpp
+    sqlhighlighter.hpp \
+    databasefile.hpp
 FORMS += mainwindow.ui
 RESOURCES += resources.qrc
 OTHER_FILES += highlighter/sql_keywords.txt \
