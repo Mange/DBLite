@@ -154,8 +154,13 @@ void MainWindow::refreshMruList()
     // Update the data, titles, etc. for all the actions
     for (unsigned short i = 0; i < actionsCount; i++)
     {
+        // Most Recently Used action text. Argument 1 is the number, 2 is the filename
+        QString actionText = tr("&%1: %2").
+                             arg(QString::number(i+1)).
+                             arg(QFileInfo(files[i]).fileName());
+
         mruActions[i]->setData(files[i]);
-        mruActions[i]->setText(QFileInfo(files[i]).fileName());
+        mruActions[i]->setText(actionText);
         mruActions[i]->setVisible(true);
     }
 

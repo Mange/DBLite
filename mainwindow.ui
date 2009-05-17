@@ -111,7 +111,7 @@
       <bool>false</bool>
      </property>
      <property name="title">
-      <string>Open recent</string>
+      <string>Open &amp;recent</string>
      </property>
     </widget>
     <addaction name="actionOpen"/>
@@ -152,7 +152,7 @@
      <normaloff>:/main/icons/fileopen.png</normaloff>:/main/icons/fileopen.png</iconset>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string>&amp;Open</string>
    </property>
    <property name="toolTip">
     <string>Open a SQLite 3 database</string>
@@ -173,7 +173,7 @@
      <normaloff>:/main/icons/exec.png</normaloff>:/main/icons/exec.png</iconset>
    </property>
    <property name="text">
-    <string>Execute query</string>
+    <string>E&amp;xecute query</string>
    </property>
    <property name="toolTip">
     <string>Execute the entered query</string>
@@ -183,15 +183,18 @@
    </property>
   </action>
   <action name="actionClose">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/main/icons/fileclose.png</normaloff>:/main/icons/fileclose.png</iconset>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>&amp;Close</string>
    </property>
    <property name="toolTip">
     <string>Close the opened database</string>
@@ -206,7 +209,7 @@
      <normaloff>:/main/icons/application_exit.png</normaloff>:/main/icons/application_exit.png</iconset>
    </property>
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -216,12 +219,15 @@
    </property>
   </action>
   <action name="actionReloadTree">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/main/icons/refresh.png</normaloff>:/main/icons/refresh.png</iconset>
    </property>
    <property name="text">
-    <string>Reload tables</string>
+    <string>&amp;Reload tables</string>
    </property>
    <property name="toolTip">
     <string>Reload the tables listing from the database</string>
