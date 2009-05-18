@@ -1,6 +1,8 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
+#include "settingswindow.hpp"
+
 MainWindow::MainWindow(QString filename, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -273,4 +275,13 @@ void MainWindow::on_actionExecute_query_triggered()
     setStatusBarMessage(message);
 
     QApplication::restoreOverrideCursor();
+}
+
+void MainWindow::on_actionSettings_triggered()
+{
+    // Open the settings window
+    SettingsWindow settings(this);
+    settings.setWindowModality(Qt::ApplicationModal);
+    settings.exec();
+    //settings.show();
 }

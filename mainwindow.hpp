@@ -67,6 +67,7 @@ private slots:
     /* Internal slots */
 
     // Updates the title to contain the opened database's name
+    void on_actionSettings_triggered();
     void updateTitle();
 
     // Enables / Disables states depending on a file is opened or not

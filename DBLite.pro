@@ -8,11 +8,14 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
     sqlhighlighter.cpp \
-    databasefile.cpp
+    databasefile.cpp \
+    settingswindow.cpp
 HEADERS += mainwindow.hpp \
     sqlhighlighter.hpp \
-    databasefile.hpp
-FORMS += mainwindow.ui
+    databasefile.hpp \
+    settingswindow.hpp
+FORMS += mainwindow.ui \
+    settingswindow.ui
 RESOURCES += resources.qrc
 OTHER_FILES += highlighter/sql_keywords.txt \
     highlighter/sql_functions.txt
