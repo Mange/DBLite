@@ -1,4 +1,6 @@
 # Auto-generated files
+bin/
+obj/
 *.o
 *.app
 Makefile
