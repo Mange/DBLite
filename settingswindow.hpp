@@ -4,32 +4,12 @@
 #include <QtGui/QDialog>
 #include <QtGui>
 
+#include "settingsproxy.hpp"
+
 namespace Ui
 {
     class SettingsWindow;
 }
-
-enum StartupAction {
-    BlankWindow,
-    LastOpenedFile,
-    StartupActionCount
-};
-
-/* Define a settings proxy object to save the settings in before saving to permanent storage */
-class SettingsProxy : public QObject
-{
-    Q_OBJECT;
-
-public:
-    SettingsProxy();
-
-    void loadSettings();
-    void saveSettings();
-    StartupAction startupActionCast(int action);
-
-    unsigned short recentCount;
-    StartupAction startupAction;
-};
 
 class SettingsWindow : public QDialog
 {
@@ -45,6 +25,7 @@ private:
     void applyProxyToForm();
 
 private slots:
+    void on_buttonResetMru_clicked();
     void on_spinMruCount_valueChanged(int count);
     void on_radioStartupLastFile_toggled(bool checked);
     void on_radioStartupBlank_toggled(bool checked);

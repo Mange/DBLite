@@ -1,33 +1,6 @@
 #include "settingswindow.hpp"
 #include "ui_settingswindow.h"
 
-SettingsProxy::SettingsProxy()
-{
-}
-
-StartupAction SettingsProxy::startupActionCast(int action)
-{
-    if (action >= BlankWindow && action < StartupActionCount)
-    {
-        return (StartupAction) action;
-    }
-    return BlankWindow;
-}
-
-void SettingsProxy::loadSettings()
-{
-    QSettings settings("Magnus Bergmark", "DBLite");
-    recentCount = settings.value("Max recent files", 5).toInt();
-    startupAction = startupActionCast(settings.value("Startup action", (int) BlankWindow).toInt());
-}
-
-void SettingsProxy::saveSettings()
-{
-    QSettings settings("Magnus Bergmark", "DBLite");
-    settings.setValue("Max recent files", recentCount);
-    settings.setValue("Startup action", (int) startupAction);
-}
-
 SettingsWindow::SettingsWindow(QWidget *parent)
     : QDialog(parent), ui(new Ui::SettingsWindow)
 {
@@ -39,10 +12,10 @@ SettingsWindow::SettingsWindow(QWidget *parent)
 
 void SettingsWindow::applyProxyToForm()
 {
-    ui->spinMruCount->setValue(proxy.recentCount);
+    ui->spinMruCount->setValue(proxy.getRecentCount());
 
-    ui->radioStartupBlank   ->setChecked(proxy.startupAction == BlankWindow);
-    ui->radioStartupLastFile->setChecked(proxy.startupAction == LastOpenedFile);
+    ui->radioStartupBlank   ->setChecked(proxy.getStartupAction() == BlankWindow);
+    ui->radioStartupLastFile->setChecked(proxy.getStartupAction() == LastOpenedFile);
 }
 
 void SettingsWindow::on_buttonBox_clicked(QAbstractButton *activated)
@@ -55,16 +28,21 @@ void SettingsWindow::on_buttonBox_clicked(QAbstractButton *activated)
 void SettingsWindow::on_radioStartupBlank_toggled(bool checked)
 {
     if (checked)
-        proxy.startupAction = BlankWindow;
+        proxy.setStartupAction(BlankWindow);
 }
 
 void SettingsWindow::on_radioStartupLastFile_toggled(bool checked)
 {
     if (checked)
-        proxy.startupAction = LastOpenedFile;
+        proxy.setStartupAction(LastOpenedFile);
 }
 
 void SettingsWindow::on_spinMruCount_valueChanged(int count)
 {
-    proxy.recentCount = count;
+    proxy.setRecentCount(count);
+}
+
+void SettingsWindow::on_buttonResetMru_clicked()
+{
+    proxy.getSettings()->setValue("Recent files", QStringList());
 }

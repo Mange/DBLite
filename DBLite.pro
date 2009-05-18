@@ -9,11 +9,13 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     sqlhighlighter.cpp \
     databasefile.cpp \
-    settingswindow.cpp
+    settingswindow.cpp \
+    settingsproxy.cpp
 HEADERS += mainwindow.hpp \
     sqlhighlighter.hpp \
     databasefile.hpp \
-    settingswindow.hpp
+    settingswindow.hpp \
+    settingsproxy.hpp
 FORMS += mainwindow.ui \
     settingswindow.ui
 RESOURCES += resources.qrc

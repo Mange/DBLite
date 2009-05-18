@@ -30,17 +30,8 @@ void MainWindow::init()
 
     setAttribute(Qt::WA_DeleteOnClose);
     setUnifiedTitleAndToolBarOnMac(true);
-    maxMruItems = 5;
 
-    // Create mru actions
-    //mruActions = QList<QAction*>();
-    for (unsigned short i = 0; i < maxMruItems; i++)
-    {
-        mruActions << new QAction(this);
-        mruActions[i]->setVisible(false);
-        ui->menuOpenRecent->addAction(mruActions[i]);
-        connect(mruActions[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
-    }
+    loadSettings();
 
     // Connect slots
     connect(this, SIGNAL(fileOpened()), this, SLOT(updateTitle()));
@@ -55,6 +46,28 @@ void MainWindow::init()
     updateTitle();
     setActionStates();
     refreshMruList();
+}
+
+void MainWindow::loadSettings()
+{
+    settings.loadSettings();
+}
+
+void MainWindow::createMruActions(unsigned short count)
+{
+    if (mruActions.size() > count)
+    {
+        while(mruActions.size() > count)
+            delete mruActions.takeLast();
+    }
+
+    for (unsigned short i = mruActions.size(); i < count; i++)
+    {
+        mruActions << new QAction(this);
+        mruActions[i]->setVisible(false);
+        ui->menuOpenRecent->addAction(mruActions[i]);
+        connect(mruActions[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
+    }
 }
 
 QString MainWindow::askForFilename()
@@ -135,32 +148,28 @@ void MainWindow::openNewWindow(QString filename)
 
 void MainWindow::pushToMruList()
 {
-    QSettings settings("Magnus Bergmark", "DBLite", this);
-    QStringList files = settings.value("Recent files").toStringList();
+    loadSettings();
+    QStringList files = settings.getSettings()->value("Recent files").toStringList();
 
     // FIXME: Just reorder when we push a path already there
     files.push_front(openedFile.fullFileName());
-    while(files.size() > maxMruItems)
+    while(files.size() > settings.getRecentCount())
         files.removeLast();
 
-    settings.setValue("Recent files", files);
-
-    // Make all windows refresh their MRU actions
-    foreach (QWidget *widget, QApplication::topLevelWidgets())
-    {
-         MainWindow *mainWin = qobject_cast<MainWindow *>(widget);
-         if (mainWin)
-             mainWin->refreshMruList();
-     }
+    settings.getSettings()->setValue("Recent files", files);
+    globalRefreshMruList();
 }
 
 void MainWindow::refreshMruList()
 {
-    QSettings settings("Magnus Bergmark", "DBLite", this);
-    QStringList files = settings.value("Recent files").toStringList();
+    loadSettings();
+    QStringList files = settings.getSettings()->value("Recent files").toStringList();
 
     // Make sure we don't iterate too far
-    unsigned short actionsCount = qMin(files.size(), mruActions.size());
+    unsigned short actionsCount = qMin(files.size(), (int) settings.getRecentCount());
+
+    // Ensure right amount of actions
+    createMruActions(actionsCount);
 
     // Update the data, titles, etc. for all the actions
     for (unsigned short i = 0; i < actionsCount; i++)
@@ -183,6 +192,16 @@ void MainWindow::refreshMruList()
 
     // Enable the submenu if we had any files visible
     ui->menuOpenRecent->setEnabled(actionsCount > 0);
+}
+
+void MainWindow::globalRefreshMruList()
+{
+    foreach (QWidget *widget, QApplication::topLevelWidgets())
+    {
+         MainWindow *mainWin = qobject_cast<MainWindow *>(widget);
+         if (mainWin)
+             mainWin->refreshMruList();
+     }
 }
 
 void MainWindow::reloadTableTree()
@@ -283,5 +302,8 @@ void MainWindow::on_actionSettings_triggered()
     SettingsWindow settings(this);
     settings.setWindowModality(Qt::ApplicationModal);
     settings.exec();
-    //settings.show();
+
+    // Reload all settings
+    loadSettings();
+    globalRefreshMruList();
 }

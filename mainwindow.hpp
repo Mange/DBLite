@@ -8,6 +8,7 @@
 
 #include "sqlhighlighter.hpp"
 #include "databasefile.hpp"
+#include "settingsproxy.hpp"
 
 namespace Ui
 {
@@ -30,14 +31,18 @@ private:
     Ui::MainWindow *ui;
     DatabaseFile openedFile;
     SqlHighlighter *highlighter;
+    SettingsProxy settings;
 
-    unsigned short maxMruItems;
     QList<QAction*> mruActions;
 
     /* Methods */
 
     // Helper method to keep common constructor logic in one place
     void init();
+    void loadSettings();
+
+    // Make sure we have count MRU actions present. This might mean deleting and it might mean creating new ones
+    void createMruActions(unsigned short count);
 
     // Returns a QString to a path chosen by the user. If the user aborted, the null string will be returned
     QString askForFilename();
@@ -86,6 +91,9 @@ private slots:
     // Refreshes the recently used list in the UI. Only updates all the actions in the menu
     // from the settings, nothing more.
     void refreshMruList();
+
+    // Refreshes the MRU list in every opened window
+    void globalRefreshMruList();
 
     // Clears and readds information about the tables in the tree view
     // TODO: Make this a bit better by actually just updating instead of destroying/rebuilding
