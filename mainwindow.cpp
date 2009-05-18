@@ -226,10 +226,7 @@ void MainWindow::reloadTableTree()
 
 void MainWindow::on_actionQuit_triggered()
 {
-    // Close everything and quit
-    // TODO: We should loop over all windows here, I guess.
-    ui->actionClose->trigger();
-    emit close();
+    QApplication::closeAllWindows();
 }
 
 void MainWindow::on_actionOpen_triggered()
