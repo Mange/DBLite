@@ -63,7 +63,10 @@ QString MainWindow::askForFilename()
 
 bool MainWindow::loadFile(QString filename)
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     openedFile.open(filename);
+    QApplication::restoreOverrideCursor();
+
     if(openedFile.valid())
     {
         emit fileOpened();
@@ -177,6 +180,8 @@ void MainWindow::refreshMruList()
 
 void MainWindow::reloadTableTree()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     ui->tableTree->clear();
     if (!openedFile.valid())
         return;
@@ -210,6 +215,8 @@ void MainWindow::reloadTableTree()
 
     // Pre-expand root node
     root->setExpanded(true);
+
+    QApplication::restoreOverrideCursor();
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -230,6 +237,8 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_actionExecute_query_triggered()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     resetResultView();
     QSqlQueryModel *model = new QSqlQueryModel(ui->resultView);
     openedFile.executeQuery(ui->queryEdit->toPlainText(), model);
@@ -260,4 +269,6 @@ void MainWindow::on_actionExecute_query_triggered()
         message = tr("Query affected %n row(s)", "", model->query().numRowsAffected());
     }
     setStatusBarMessage(message);
+
+    QApplication::restoreOverrideCursor();
 }
