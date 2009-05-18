@@ -56,9 +56,6 @@ signals:
     // Emitted when a file is opened in the current window
     void fileOpened();
 
-    // Emitted when the recently used files list was changed
-    void mruChanged();
-
     // TODO: Add a signal for query about the be executed (before)
     // TODO: Add a signal for queries doing changes to the database (after)
     // TODO: Add a signal for queries doing selects from the database (after)

@@ -46,7 +46,6 @@ void MainWindow::init()
     connect(this, SIGNAL(fileOpened()), this, SLOT(reloadTableTree()));
 
     connect(this, SIGNAL(fileOpened()), this, SLOT(pushToMruList()));
-    connect(this, SIGNAL(mruChanged()), this, SLOT(refreshMruList()));
 
     connect(ui->actionReloadTree, SIGNAL(triggered()), this, SLOT(reloadTableTree()));
     connect(ui->actionNewWindow,  SIGNAL(triggered()), this, SLOT(openNewWindow()));
@@ -144,7 +143,13 @@ void MainWindow::pushToMruList()
 
     settings.setValue("Recent files", files);
 
-    emit mruChanged();
+    // Make all windows refresh their MRU actions
+    foreach (QWidget *widget, QApplication::topLevelWidgets())
+    {
+         MainWindow *mainWin = qobject_cast<MainWindow *>(widget);
+         if (mainWin)
+             mainWin->refreshMruList();
+     }
 }
 
 void MainWindow::refreshMruList()
