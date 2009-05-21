@@ -47,9 +47,20 @@ private:
     // Returns a QString to a path chosen by the user. If the user aborted, the null string will be returned
     QString askForFilename();
 
-    // Opens and load the given file. On error, false will be returned. On success, fileOpened
-    // signal will be emitted and true returned.
+    // Returns a QStringList of n chosen files by the user. If the user aborted, the list will be empty
+    QStringList askForFilenames();
+
+    // Opens and load the given file in the current window. On error, false will be returned.
+    // On success, fileOpened signal will be emitted and true returned.
     bool loadFile(QString filename);
+
+    // Opens the given filename, in this window if nothing is opened here, and in another window if
+    // a file already is open in this one.
+    void openFiles(QString filename);
+
+    // Opens the given files. Practicly, the filenames will be iterated and opened with the single
+    // file version of this method.
+    void openFiles(QStringList filenames);
 
     // Helper method for setting message in status bar
     void setStatusBarMessage(QString message);

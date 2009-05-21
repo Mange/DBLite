@@ -75,6 +75,11 @@ QString MainWindow::askForFilename()
     return QFileDialog::getOpenFileName(this, tr("Open database file"));
 }
 
+QStringList MainWindow::askForFilenames()
+{
+    return QFileDialog::getOpenFileNames(this, tr("Open database files"));
+}
+
 bool MainWindow::loadFile(QString filename)
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -96,6 +101,20 @@ bool MainWindow::loadFile(QString filename)
         );
         return false;
     }
+}
+
+void MainWindow::openFiles(QString filename)
+{
+    if (openedFile.valid())
+        openNewWindow(filename);
+    else
+        loadFile(filename);
+}
+
+void MainWindow::openFiles(QStringList filenames)
+{
+    foreach (QString filename, filenames)
+        openFiles(filename);
 }
 
 void MainWindow::setStatusBarMessage(QString message)
@@ -130,13 +149,7 @@ void MainWindow::openRecentFile()
 {
     QAction *senderAction = qobject_cast<QAction*>(sender());
     if (senderAction)
-    {
-        QString filename = senderAction->data().toString();
-        if (openedFile.valid())
-            openNewWindow(filename);
-        else
-            loadFile(filename);
-    }
+        openFiles(senderAction->data().toString());
 }
 
 void MainWindow::openNewWindow(QString filename)
@@ -252,10 +265,7 @@ void MainWindow::on_actionQuit_triggered()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    if (openedFile.valid())
-        openNewWindow(askForFilename());
-    else
-        loadFile(askForFilename());
+    openFiles(askForFilenames());
 }
 
 void MainWindow::on_actionExecute_query_triggered()
