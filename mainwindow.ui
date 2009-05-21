@@ -190,7 +190,7 @@
     <string>Execute the entered query</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E</string>
+    <string>Ctrl+Return</string>
    </property>
   </action>
   <action name="actionClose">
