@@ -1,5 +1,6 @@
 #include <QtGui/QApplication>
 #include "mainwindow.hpp"
+#include "settingsproxy.hpp"
 
 int main(int argc, char *argv[])
 {    
@@ -21,15 +22,26 @@ int main(int argc, char *argv[])
     rootMenu->addAction(quitAction);
 #endif
 
+    SettingsProxy *settings = new SettingsProxy();
     MainWindow *w;
 
     // Look for command line arguments
+    // FIXME: I really, really don't like the code below. I should probably find a good way to refactor it.
     QStringList arguments = a.arguments();
     if (arguments.size() > 1)
+    {
         w = new MainWindow(arguments[1]);
+    }
     else
-        w = new MainWindow();
+    {
+        settings->loadSettings();
+        if (settings->getStartupAction() == LastOpenedFile && !settings->getMostRecentFile().isEmpty())
+            w = new MainWindow(settings->getMostRecentFile());
+        else
+            w = new MainWindow();
+    }
 
+    delete settings;
     w->show();
     return a.exec();
 }

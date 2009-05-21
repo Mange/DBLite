@@ -44,5 +44,5 @@ void SettingsWindow::on_spinMruCount_valueChanged(int count)
 
 void SettingsWindow::on_buttonResetMru_clicked()
 {
-    proxy.getSettings()->setValue("Recent files", QStringList());
+    proxy.resetRecentFiles();
 }

@@ -8,7 +8,7 @@ MainWindow::MainWindow(QString filename, QWidget *parent)
 {
     init();
     if (!filename.isEmpty())
-        loadFile(filename);
+        openFiles(filename);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -105,6 +105,9 @@ bool MainWindow::loadFile(QString filename)
 
 void MainWindow::openFiles(QString filename)
 {
+    if (filename.isEmpty())
+        return;
+
     if (openedFile.valid())
         openNewWindow(filename);
     else
@@ -161,15 +164,7 @@ void MainWindow::openNewWindow(QString filename)
 
 void MainWindow::pushToMruList()
 {
-    loadSettings();
-    QStringList files = settings.getSettings()->value("Recent files").toStringList();
-
-    // FIXME: Just reorder when we push a path already there
-    files.push_front(openedFile.fullFileName());
-    while(files.size() > settings.getRecentCount())
-        files.removeLast();
-
-    settings.getSettings()->setValue("Recent files", files);
+    settings.addToRecentFiles(openedFile.fullFileName());
     globalRefreshMruList();
 }
 
