@@ -23,25 +23,23 @@ int main(int argc, char *argv[])
 #endif
 
     SettingsProxy *settings = new SettingsProxy();
+    settings->loadSettings();
+
     MainWindow *w;
 
     // Look for command line arguments
-    // FIXME: I really, really don't like the code below. I should probably find a good way to refactor it.
+    QString fileToOpen;
     QStringList arguments = a.arguments();
     if (arguments.size() > 1)
-    {
-        w = new MainWindow(arguments[1]);
-    }
+        fileToOpen = arguments.at(0);
+    else if (settings->getStartupAction() == LastOpenedFile && !settings->getMostRecentFile().isEmpty())
+        fileToOpen = settings->getMostRecentFile();
     else
-    {
-        settings->loadSettings();
-        if (settings->getStartupAction() == LastOpenedFile && !settings->getMostRecentFile().isEmpty())
-            w = new MainWindow(settings->getMostRecentFile());
-        else
-            w = new MainWindow();
-    }
+        fileToOpen = QString();
 
     delete settings;
+
+    w = new MainWindow(fileToOpen);
     w->show();
     return a.exec();
 }
